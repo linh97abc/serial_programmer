@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SerialProg/SerialProg.csproj" />
+  <Project Path="TestProg/TestProg.csproj" />
+</Solution>
