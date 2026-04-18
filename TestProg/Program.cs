@@ -20,8 +20,36 @@ string SwFilePath = args[2];
 // string SwFilePath = "app_sw.bin";
 
 Console.WriteLine($"Serial Programmer: port {PortName}");
-Console.WriteLine($" -- FW: {FwFilePath}");
-Console.WriteLine($" -- SW: {SwFilePath}");
+
+if (FwFilePath == "-")
+{
+    Console.WriteLine("Skip firmware programming.");
+}
+else
+{
+    Console.WriteLine($"Firmware file path: {FwFilePath}");
+    if (!System.IO.File.Exists(FwFilePath))
+    {
+        Console.WriteLine($"Firmware file not found: {FwFilePath}");
+        return;
+    }
+}
+
+
+if (SwFilePath == "-")
+{
+    Console.WriteLine("Skip software programming.");
+}
+else
+{
+    Console.WriteLine($"Software file path: {SwFilePath}");
+    if (!System.IO.File.Exists(SwFilePath))
+    {
+        Console.WriteLine($"Software file not found: {SwFilePath}");
+        return;
+    }
+}
+
 
 var serialProg = new SerialProg.SerialProg();
 
@@ -43,28 +71,33 @@ catch (Exception ex)
 }
 
 
+if (FwFilePath != "-")
+{
+    try
+    {
+        Console.WriteLine("Start program firmware...");
+        await serialProg.ProgFlash(FwFilePath, 0x80000);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Error Programming Firmware: " + ex.Message);
+        return;
+    }
+}
 
-try
+if (SwFilePath != "-")
 {
-    Console.WriteLine("Start program firmware...");
-    await serialProg.ProgFlash(FwFilePath, 0x80000);
-}
-catch (Exception ex)
-{
-    Console.WriteLine("Error Programming Firmware: " + ex.Message);
-    return;
-}
-
-try
-{
-    Console.WriteLine("Start program software...");
-    await serialProg.ProgFlash(SwFilePath, 0x200000);
-}
-catch (Exception ex)
-{
-    Console.WriteLine("Error Programming Software: " + ex.Message);
-    return;
+    try
+    {
+        Console.WriteLine("Start program software...");
+        await serialProg.ProgFlash(SwFilePath, 0x200000);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Error Programming Software: " + ex.Message);
+        return;
+    }
 }
 
 Console.WriteLine("Programming completed successfully.");
-Console.Read();
+// Console.Read();
